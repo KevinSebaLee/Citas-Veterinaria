@@ -1,10 +1,34 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TarjetaCita from './components/tarjetaCita/tarjetaCita';
 import CrearCita from './components/crearCita/crearCita';
 
 function App() {
   const [citas, setCitas] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const citasLocalStorage = localStorage.getItem('citas');
+    if (citasLocalStorage) {
+      try {
+        const citasParseadas = JSON.parse(citasLocalStorage);
+        if (citasParseadas) {
+          setCitas(citasParseadas);
+        }
+      } catch (error) {
+        console.error("Error parsing citas from localStorage:", error);
+
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const jsonCitas = JSON.stringify(citas);
+      localStorage.setItem('citas', jsonCitas);
+    }
+  }, [citas, isLoading]);
 
   const agregarCita = (nuevaCita) => {
     setCitas([...citas, nuevaCita]);
